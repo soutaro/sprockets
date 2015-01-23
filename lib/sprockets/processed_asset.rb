@@ -1,10 +1,15 @@
 require 'sprockets/asset'
 require 'sprockets/utils'
 
+$indent = 0
+
 module Sprockets
   class ProcessedAsset < Asset
     def initialize(environment, logical_path, pathname)
       super
+
+      $indent += 1
+      environment.logger.debug(" "*$indent + "Starting compilation of #{logical_path}")
 
       start_time = Time.now.to_f
 
@@ -19,7 +24,9 @@ module Sprockets
       @dependency_digest = compute_dependency_digest(environment)
 
       elapsed_time = ((Time.now.to_f - start_time) * 1000).to_i
-      environment.logger.debug "Compiled #{logical_path}  (#{elapsed_time}ms)  (pid #{Process.pid})"
+      environment.logger.debug(" "*$indent + "Compiled #{logical_path}  (#{elapsed_time}ms)  (pid #{Process.pid})")
+
+      $indent -= 1
     end
 
     # Interal: Used to check equality

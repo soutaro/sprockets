@@ -192,6 +192,8 @@ module Sprockets
       end
 
       processors.each do |processor|
+        start_time = Time.now.to_f
+
         begin
           template = processor.new(pathname.to_s) { result }
           result = template.render(self, {})
@@ -199,6 +201,9 @@ module Sprockets
           annotate_exception! e
           raise
         end
+
+        elapsed_time = ((Time.now.to_f - start_time) * 1000).to_i
+        environment.logger.debug(" "*$indent + "| Spend #{elapsed_time}ms for #{processor}")
       end
 
       result
